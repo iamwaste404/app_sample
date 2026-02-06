@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 80px;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .ai-logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .hamburger-btn {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .hamburger-btn span {
+            width: 25px;
+            height: 3px;
+            background: #667eea;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 100px 20px 20px;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 998;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .menu-item-icon {
+            font-size: 20px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
+            z-index: 900;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Sub Pages */
+        .sub-page {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .sub-page.active {
+            display: block;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #667eea;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: translateX(-3px);
+        }
+
+        .page-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        /* Login Page Styles */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 450px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-card h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .greeting-section h2 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .greeting-section p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .user-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-details h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Content Sections */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        /* Quick Access Cards */
+        .quick-access-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quick-card {
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-icon {
+            font-size: 40px;
+        }
+
+        .quick-label {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Today's Schedule Section */
+        .schedule-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .schedule-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .class-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .class-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .class-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            text-align: left;
+        }
+
+        .class-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .class-status {
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-present {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-absent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-upcoming {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .content-card h3 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .content-card h3:hover {
+            color: #764ba2;
+        }
+
+        .card-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .card-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            display: none;
+        }
+
+        .card-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Attendance Section */
+        .attendance-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .attendance-chart {
+            margin-top: 20px;
+        }
+
+        .bar-container {
+            margin-bottom: 15px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .bar-bg {
+            background: #e0e0e0;
+            height: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Courses Section */
+        .course-list {
+            list-style: none;
+        }
+
+        .course-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .course-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .course-time {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .materials-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .materials-section.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .unit-section {
+            margin-bottom: 15px;
+        }
+
+        .unit-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .material-link {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 6px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .material-link:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Exam Performance */
+        .semester-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .semester-tab {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .semester-tab.current {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .semester-tab:hover:not(.current) {
+            background: #e0e0e0;
+        }
+
+        .exam-details {
+            display: none;
+        }
+
+        .exam-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .subject-grade {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .subject-grade .grade {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .gpa-display {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .gpa-display h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .gpa-display .gpa-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .greeting-section {
+                text-align: center;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .login-card {
+                padding: 30px;
+            }
+
+            .dashboard-content {
+                grid-template-columns: 1fr !important;
+            }
+
+            .quick-access-section {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="login-card">
+            <h1>Welcome Back!</h1>
+            <p>Login to access your student profile</p>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardPage" class="dashboard">
+            <!-- Hamburger Menu Container -->
+            <div class="hamburger-container">
+                <div class="ai-logo">AI</div>
+                <button class="hamburger-btn" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+
+            <!-- Side Menu -->
+            <div class="side-menu" id="sideMenu">
+                <div class="menu-item" onclick="showAboutCollege()">
+                    <span class="menu-item-icon">🏫</span>
+                    <span>About College</span>
+                </div>
+                <div class="menu-item" onclick="showHelpDesk()">
+                    <span class="menu-item-icon">💬</span>
+                    <span>Help Desk</span>
+                </div>
+                <div class="menu-item" onclick="showResetPassword()">
+                    <span class="menu-item-icon">🔑</span>
+                    <span>Reset Password</span>
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <span class="menu-item-icon">🚪</span>
+                    <span>Logout</span>
+                </div>
+            </div>
+            <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+            <div class="dashboard-header">
+                <div class="greeting-section">
+                    <h2 id="greetingText">Good Morning!</h2>
+                    <p id="welcomeMessage">Welcome to your dashboard</p>
+                </div>
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Student&background=667eea&color=fff&size=200" alt="User Photo" class="user-photo" id="userPhoto">
+                    <div class="user-details">
+                        <h3 id="userName">Student Name</h3>
+                        <p>Roll No: <span id="userRollNo">-</span></p>
+                        <p>Branch: <span id="userBranch">-</span></p>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Left Section - Quick Access Cards -->
+                <div class="quick-access-section">
+                    <div class="quick-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="openPage('attendance')">
+                        <div class="quick-icon">📊</div>
+                        <div class="quick-label">Attendance</div>
+                    </div>
+                    <div class="quick-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="openPage('courses')">
+                        <div class="quick-icon">📚</div>
+                        <div class="quick-label">Courses</div>
+                    </div>
+                    <div class="quick-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onclick="openPage('exam')">
+                        <div class="quick-icon">📈</div>
+                        <div class="quick-label">Exam Performance</div>
+                    </div>
+                </div>
+
+                <!-- Right Section - Today's Schedule -->
+                <div class="schedule-section">
+                    <h3 style="color: white; margin-bottom: 20px; font-size: 24px;">📅 Today's Classes</h3>
+                    <div class="schedule-container" id="todaySchedule">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showSection('home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showSection('categories')">
+                    <div class="nav-icon">📂</div>
+                    <div class="nav-label">Categories</div>
+                </div>
+                <div class="nav-item" onclick="showSection('notifications')">
+                    <div class="nav-icon">🔔</div>
+                    <div class="nav-label">Notifications</div>
+                </div>
+                <div class="nav-item" onclick="showSection('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Page -->
+        <div id="attendancePage" class="sub-page">
+            <div class="page-header">
+                <button class="back-btn" onclick="backToHome()">← Back</button>
+                <h2>📊 Attendance</h2>
+            </div>
+            <div class="page-content">
+                <div class="content-card">
+                    <div class="attendance-toggle">
+                        <button class="toggle-btn active" onclick="toggleAttendance('weekly')">Weekly</button>
+                        <button class="toggle-btn" onclick="toggleAttendance('monthly')">Monthly</button>
+                    </div>
+                    <div class="attendance-chart" id="attendanceChart">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Page -->
+        <div id="coursesPage" class="sub-page">
+            <div class="page-header">
+                <button class="back-btn" onclick="backToHome()">← Back</button>
+                <h2>📚 Courses</h2>
+            </div>
+            <div class="page-content">
+                <div class="content-card">
+                    <ul class="course-list" id="courseList">
+                        <!-- Will be populated by JavaScript -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam Performance Page -->
+        <div id="examPage" class="sub-page">
+            <div class="page-header">
+                <button class="back-btn" onclick="backToHome()">← Back</button>
+                <h2>📈 Exam Performance</h2>
+            </div>
+            <div class="page-content">
+                <div class="content-card">
+                    <div class="semester-tabs" id="semesterTabs">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    <div id="examDetailsContainer">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample student data (in a real app, this would come from a backend)
+        const studentData = {
+            'student@college.edu': {
+                name: 'Alex Johnson',
+                rollNo: '2024CS001',
+                branch: 'Computer Science',
+                photo: 'https://ui-avatars.com/api/?name=Alex+Johnson&background=667eea&color=fff&size=200'
+            },
+            'john@college.edu': {
+                name: 'John Doe',
+                rollNo: '2024EC042',
+                branch: 'Electronics',
+                photo: 'https://ui-avatars.com/api/?name=John+Doe&background=764ba2&color=fff&size=200'
+            }
+        };
+
+        // Sample attendance data
+        const attendanceData = {
+            weekly: {
+                'Data Structures': 85,
+                'Algorithms': 92,
+                'Database Systems': 78,
+                'Web Development': 88,
+                'Operating Systems': 95
+            },
+            monthly: {
+                'Data Structures': 82,
+                'Algorithms': 89,
+                'Database Systems': 75,
+                'Web Development': 91,
+                'Operating Systems': 93
+            }
+        };
+
+        // Sample courses data
+        const coursesData = [
+            {
+                name: 'Data Structures',
+                time: 'Mon, Wed, Fri - 9:00 AM',
+                materials: {
+                    'Unit 1': ['Arrays & Linked Lists.pdf', 'Practice Problems.pdf', 'Bit Bank Questions.pdf'],
+                    'Unit 2': ['Stacks & Queues.pdf', 'Question Bank.pdf', 'Lab Manual.pdf'],
+                    'Unit 3': ['Trees & Graphs.pdf', 'Previous Papers.pdf', 'Sample Questions.pdf']
+                }
+            },
+            {
+                name: 'Algorithms',
+                time: 'Tue, Thu - 10:30 AM',
+                materials: {
+                    'Unit 1': ['Sorting Algorithms.pdf', 'Bit Bank.pdf', 'Tutorial Sheet.pdf'],
+                    'Unit 2': ['Searching Techniques.pdf', 'Question Bank.pdf', 'Practice Set.pdf'],
+                    'Unit 3': ['Dynamic Programming.pdf', 'Previous Year Papers.pdf']
+                }
+            },
+            {
+                name: 'Database Systems',
+                time: 'Mon, Wed - 2:00 PM',
+                materials: {
+                    'Unit 1': ['SQL Basics.pdf', 'ER Diagrams.pdf', 'Bit Bank Questions.pdf'],
+                    'Unit 2': ['Normalization.pdf', 'Question Bank.pdf'],
+                    'Unit 3': ['Transactions.pdf', 'Sample Papers.pdf']
+                }
+            },
+            {
+                name: 'Web Development',
+                time: 'Tue, Thu - 3:30 PM',
+                materials: {
+                    'Unit 1': ['HTML & CSS.pdf', 'Practice Exercises.pdf'],
+                    'Unit 2': ['JavaScript Basics.pdf', 'Question Bank.pdf'],
+                    'Unit 3': ['React Framework.pdf', 'Project Ideas.pdf']
+                }
+            },
+            {
+                name: 'Operating Systems',
+                time: 'Fri - 11:00 AM',
+                materials: {
+                    'Unit 1': ['Process Management.pdf', 'Bit Bank.pdf'],
+                    'Unit 2': ['Memory Management.pdf', 'Question Bank.pdf'],
+                    'Unit 3': ['File Systems.pdf', 'Previous Papers.pdf']
+                }
+            }
+        ];
+
+        // Today's Schedule Data
+        const todaySchedule = [
+            { time: '9:00 AM', name: 'Data Structures', status: 'present' },
+            { time: '10:30 AM', name: 'Algorithms', status: 'present' },
+            { time: '11:00 AM', name: 'Operating Systems', status: 'absent' },
+            { time: '2:00 PM', name: 'Database Systems', status: 'upcoming' },
+            { time: '3:30 PM', name: 'Web Development', status: 'upcoming' }
+        ];
+
+        // Render today's schedule
+        function renderTodaySchedule() {
+            const scheduleHTML = todaySchedule.map(item => {
+                let statusClass = '';
+                let statusText = '';
+                
+                if (item.status === 'present') {
+                    statusClass = 'status-present';
+                    statusText = '✓ Present';
+                } else if (item.status === 'absent') {
+                    statusClass = 'status-absent';
+                    statusText = '✗ Absent';
+                } else {
+                    statusClass = 'status-upcoming';
+                    statusText = '○ Upcoming';
+                }
+                
+                return `
+                    <div class="class-item">
+                        <div class="class-time">${item.time}</div>
+                        <div class="class-name">${item.name}</div>
+                        <div class="class-status">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('todaySchedule').innerHTML = scheduleHTML;
+        }
+
+        // Sample exam performance data
+        const examData = {
+            semesters: [
+                {
+                    id: 1,
+                    name: 'Semester 1',
+                    current: false,
+                    subjects: [
+                        { name: 'Mathematics I', grade: 'A+', marks: 95 },
+                        { name: 'Physics', grade: 'A', marks: 88 },
+                        { name: 'Chemistry', grade: 'A', marks: 85 },
+                        { name: 'English', grade: 'A+', marks: 92 }
+                    ],
+                    gpa: 9.2
+                },
+                {
+                    id: 2,
+                    name: 'Semester 2',
+                    current: false,
+                    subjects: [
+                        { name: 'Mathematics II', grade: 'A', marks: 87 },
+                        { name: 'Data Structures', grade: 'A+', marks: 93 },
+                        { name: 'Digital Logic', grade: 'A', marks: 86 },
+                        { name: 'Programming in C', grade: 'A+', marks: 94 }
+                    ],
+                    gpa: 9.0
+                },
+                {
+                    id: 3,
+                    name: 'Semester 3',
+                    current: false,
+                    subjects: [
+                        { name: 'Algorithms', grade: 'A+', marks: 92 },
+                        { name: 'Computer Networks', grade: 'A', marks: 88 },
+                        { name: 'DBMS', grade: 'A+', marks: 91 },
+                        { name: 'Operating Systems', grade: 'A', marks: 87 }
+                    ],
+                    gpa: 8.9
+                },
+                {
+                    id: 4,
+                    name: 'Semester 4',
+                    current: false,
+                    subjects: [
+                        { name: 'Software Engineering', grade: 'A+', marks: 94 },
+                        { name: 'Web Technologies', grade: 'A', marks: 89 },
+                        { name: 'Computer Architecture', grade: 'A', marks: 86 },
+                        { name: 'Theory of Computation', grade: 'A+', marks: 93 }
+                    ],
+                    gpa: 9.1
+                },
+                {
+                    id: 5,
+                    name: 'Semester 5',
+                    current: false,
+                    subjects: [
+                        { name: 'Machine Learning', grade: 'A+', marks: 96 },
+                        { name: 'Compiler Design', grade: 'A', marks: 88 },
+                        { name: 'Cloud Computing', grade: 'A+', marks: 92 },
+                        { name: 'Cyber Security', grade: 'A', marks: 87 }
+                    ],
+                    gpa: 9.2
+                },
+                {
+                    id: 6,
+                    name: 'Semester 6',
+                    current: true,
+                    subjects: [
+                        { name: 'Deep Learning', grade: 'A+', marks: 95 },
+                        { name: 'Big Data Analytics', grade: 'A+', marks: 94 },
+                        { name: 'IoT', grade: 'A', marks: 89 },
+                        { name: 'Blockchain', grade: 'A+', marks: 93 }
+                    ],
+                    gpa: 9.3
+                }
+            ]
+        };
+
+        let currentAttendanceView = 'weekly';
+        let cardsRendered = {
+            attendance: false,
+            courses: false,
+            exam: false
+        };
+
+        // Toggle side menu
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Menu item functions
+        function showAboutCollege() {
+            alert('About College:\nYour College Name\nEstablished: 1990\nLocation: City, State');
+            toggleMenu();
+        }
+
+        function showHelpDesk() {
+            alert('Help Desk:\nEmail: help@college.edu\nPhone: +1234567890\nTimings: 9 AM - 5 PM');
+            toggleMenu();
+        }
+
+        function showResetPassword() {
+            alert('Reset Password:\nPlease contact admin or use the forgot password link on login page.');
+            toggleMenu();
+        }
+
+        // Bottom navigation
+        function showSection(section) {
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // Add active to clicked item
+            event.target.closest('.nav-item').classList.add('active');
+
+            // Show different sections based on selection
+            if (section === 'home') {
+                backToHome();
+            } else if (section === 'categories') {
+                alert('Categories section - Coming soon!');
+            } else if (section === 'notifications') {
+                alert('Notifications section - Coming soon!');
+            } else if (section === 'profile') {
+                alert('Profile section - Coming soon!');
+            }
+        }
+
+        // Open a specific page
+        function openPage(pageName) {
+            // Hide dashboard
+            document.getElementById('dashboardPage').style.display = 'none';
+
+            // Hide all sub-pages
+            document.querySelectorAll('.sub-page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const page = document.getElementById(`${pageName}Page`);
+            page.classList.add('active');
+
+            // Render content if not already rendered
+            if (!cardsRendered[pageName]) {
+                if (pageName === 'attendance') {
+                    renderAttendanceChart(currentAttendanceView);
+                } else if (pageName === 'courses') {
+                    renderCourses();
+                } else if (pageName === 'exam') {
+                    renderExamPerformance();
+                }
+                cardsRendered[pageName] = true;
+            }
+        }
+
+        // Back to home/dashboard
+        function backToHome() {
+            // Hide all sub-pages
+            document.querySelectorAll('.sub-page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show dashboard
+            document.getElementById('dashboardPage').style.display = 'block';
+
+            // Reset bottom nav to home
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.nav-item').classList.add('active');
+        }
+
+        // Toggle card visibility
+        function toggleCard(cardName) {
+            // Not needed anymore - kept for compatibility
+        }
+
+        // Get greeting based on time
+        function getGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'Good Morning';
+            if (hour < 17) return 'Good Afternoon';
+            return 'Good Evening';
+        }
+
+        // Render attendance chart
+        function renderAttendanceChart(view) {
+            const data = attendanceData[view];
+            const chartHTML = Object.entries(data).map(([subject, percentage]) => `
+                <div class="bar-container">
+                    <div class="bar-label">
+                        <span>${subject}</span>
+                        <span>${percentage}%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('attendanceChart').innerHTML = chartHTML;
+        }
+
+        // Toggle attendance view
+        function toggleAttendance(view) {
+            currentAttendanceView = view;
+            document.querySelectorAll('.attendance-toggle .toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderAttendanceChart(view);
+        }
+
+        // Render courses
+        function renderCourses() {
+            const coursesHTML = coursesData.map((course, index) => `
+                <li class="course-item" onclick="toggleMaterials(${index})">
+                    <div class="course-name">${course.name}</div>
+                    <div class="course-time">${course.time}</div>
+                    <div class="materials-section" id="materials-${index}">
+                        ${Object.entries(course.materials).map(([unit, files]) => `
+                            <div class="unit-section">
+                                <div class="unit-title">${unit}</div>
+                                ${files.map(file => `
+                                    <a href="#" class="material-link" onclick="event.preventDefault(); alert('Download: ${file}')">${file}</a>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </li>
+            `).join('');
+            
+            document.getElementById('courseList').innerHTML = coursesHTML;
+        }
+
+        // Toggle course materials
+        function toggleMaterials(index) {
+            const materials = document.getElementById(`materials-${index}`);
+            materials.classList.toggle('active');
+        }
+
+        // Render exam performance
+        function renderExamPerformance() {
+            // Render semester tabs
+            const tabsHTML = examData.semesters.map(sem => `
+                <div class="semester-tab ${sem.current ? 'current' : ''}" onclick="showSemester(${sem.id})">
+                    ${sem.name} ${sem.current ? '(Current)' : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('semesterTabs').innerHTML = tabsHTML;
+
+            // Render exam details for each semester
+            const detailsHTML = examData.semesters.map(sem => `
+                <div class="exam-details ${sem.current ? 'active' : ''}" id="semester-${sem.id}">
+                    ${sem.subjects.map(subject => `
+                        <div class="subject-grade">
+                            <span>${subject.name}</span>
+                            <span class="grade">${subject.grade} (${subject.marks})</span>
+                        </div>
+                    `).join('')}
+                    <div class="gpa-display">
+                        <h4>Semester GPA</h4>
+                        <div class="gpa-value">${sem.gpa}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('examDetailsContainer').innerHTML = detailsHTML;
+        }
+
+        // Show specific semester
+        function showSemester(semId) {
+            document.querySelectorAll('.semester-tab').forEach(tab => {
+                tab.classList.remove('current');
+            });
+            event.target.classList.add('current');
+
+            document.querySelectorAll('.exam-details').forEach(detail => {
+                detail.classList.remove('active');
+            });
+            document.getElementById(`semester-${semId}`).classList.add('active');
+        }
+
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Simple validation (in real app, verify with backend)
+            if (email && password) {
+                const student = studentData[email] || {
+                    name: email.split('@')[0],
+                    rollNo: '2024XX000',
+                    branch: 'General',
+                    photo: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=667eea&color=fff&size=200`
+                };
+
+                // Store login state
+                sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('studentData', JSON.stringify(student));
+
+                // Show dashboard
+                showDashboard(student);
+            }
+        });
+
+        // Show dashboard
+        function showDashboard(student) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').style.display = 'block';
+
+            // Set greeting
+            document.getElementById('greetingText').textContent = `${getGreeting()}!`;
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${student.name.split(' ')[0]}`;
+
+            // Set user info
+            document.getElementById('userName').textContent = student.name;
+            document.getElementById('userRollNo').textContent = student.rollNo;
+            document.getElementById('userBranch').textContent = student.branch;
+            document.getElementById('userPhoto').src = student.photo;
+
+            // Render today's schedule
+            renderTodaySchedule();
+
+            // Prepare data but don't render - let user click to expand
+            // Data will render when cards are clicked
+        }
+
+        // Logout function
+        function logout() {
+            sessionStorage.clear();
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('loggedIn') === 'true') {
+                const student = JSON.parse(sessionStorage.getItem('studentData'));
+                showDashboard(student);
+            }
+        });
+    </script>
+</body>
+</html>
